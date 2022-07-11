@@ -91,6 +91,14 @@
             }
         }
     };
+};
+
+module.exports = function(strUrl, strWindowName, strWindowFeatures, strWindowHeaders, callbacks) {
+    // Don't catch calls that write to existing frames (e.g. named iframes).
+    if (window.frames && window.frames[strWindowName]) {
+        var origOpenFunc = modulemapper.getOriginalSymbol(window, 'open');
+        return origOpenFunc.apply(window, arguments);
+    }
 
     module.exports = function (strUrl, strWindowName, strWindowFeatures, callbacks) {
         // Don't catch calls that write to existing frames (e.g. named iframes).
@@ -112,8 +120,10 @@
         };
 
         strWindowFeatures = strWindowFeatures || '';
+        strWindowHeaders = strWindowHeaders || '';
 
-        exec(cb, cb, 'InAppBrowser', 'open', [strUrl, strWindowName, strWindowFeatures]);
-        return iab;
+
+    exec(cb, cb, "InAppBrowser", "open", [strUrl, strWindowName, strWindowFeatures, strWindowHeaders]);
+    return iab;
     };
 })();
